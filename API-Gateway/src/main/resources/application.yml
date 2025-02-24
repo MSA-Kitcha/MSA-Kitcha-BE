@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: gateway-server
+  #  config:
+  #    import:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        - id: article
+          predicates:
+            - Path=/article/**
+          uri: lb://ARTICLE
+          filters:
+            - RewritePath=/article/(?<segment>.*), /${segment}
+        - id: authentication
+          predicates:
+            - Path=/authentication/**
+          uri: lb://AUTHENTICATION
+          filters:
+            - RewritePath=/authentication/(?<segment>.*), /${segment}
+        - id: kitcha-board
+          predicates:
+            - Path=/kitcha-board/**
+          uri: lb://KITCHA-BOARD
+          filters:
+            - RewritePath=/kitcha-board/(?<segment>.*), /${segment}
