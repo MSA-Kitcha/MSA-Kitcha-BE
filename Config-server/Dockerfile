@@ -1,7 +1,7 @@
 # Build part
 FROM gradle:8.12.1-jdk17 AS builder
 WORKDIR /app
-COPY . .
+COPY Config-server/ .
 RUN gradle build --no-daemon
 
 # Execute part
