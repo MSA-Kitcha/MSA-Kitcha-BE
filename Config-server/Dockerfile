@@ -5,7 +5,7 @@ COPY . .
 RUN gradle build --no-daemon
 
 # Execute part
-FROM openjdk:17
+FROM amazoncorretto:17
 WORKDIR /app
 COPY --from=builder /app/build/libs/configserver-0.0.1-SNAPSHOT.jar .
 ENTRYPOINT ["java", "-jar", "configserver-0.0.1-SNAPSHOT.jar"]
