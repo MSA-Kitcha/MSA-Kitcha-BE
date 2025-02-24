@@ -6,12 +6,125 @@ services:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    container_name: mysql
     volumes:
       - mysql_data:/var/lib/mysql
+      - /sys/fs/cgroup
     networks:
       - kitcha_network
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "-u", "${MYSQL_USER}","-p${MYSQL_PASSWORD}", "ping", "-h", "localhost" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    expose:
+      - "3306"
+    restart: on-failure
 
+  config-server:
+    build:
+      context: https://github.com/Team4-Kitcha/Kitcha-BE.git
+      dockerfile: Config-server/Dockerfile
+    container_name: config-server
+    networks:
+      - kitcha_network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8071/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    expose:
+      - "8071"
+    depends_on:
+      mysql:
+        condition: service_started
+    restart: on-failure
 
+  eureka:
+    build:
+      context: https://github.com/Team4-Kitcha/Kitcha-BE.git
+      dockerfile: eureka/Dockerfile
+    container_name: eureka
+    networks:
+      - kitcha_network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8071/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    expose:
+      - "8761"
+    depends_on:
+      config-server:
+        condition: service_healthy
+    restart: on-failure
+
+  gateway-server:
+    build:
+      context: https://github.com/Team4-Kitcha/Kitcha-BE.git
+      dockerfile: API-Gateway/Dockerfile
+    container_name: gateway-server
+    networks:
+      - kitcha_network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8072/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    ports:
+      - "80:8072"
+    depends_on:
+      config-server:
+        condition: service_healthy
+    restart: on-failure
+
+  auth:
+    build:
+      context: https://github.com/Team4-Kitcha/Kitcha-Authentication.git
+    container_name: auth
+    networks:
+      - kitcha_network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8091/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    expose:
+      - "8091"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      eureka:
+        condition: service_healthy
+      gateway-server:
+        condition: service_healthy
+    restart: on-failure
+
+  article:
+    build:
+      context: https://github.com/Team4-Kitcha/Kitcha-Article.git
+    container_name: article
+    networks:
+      - kitcha_network
+    expose:
+      - "8080"
+    depends_on:
+      auth:
+        condition: service_healthy
+    restart: on-failure
+
+  board:
+    build:
+      context: https://github.com/Team4-Kitcha/Kitcha-Board.git
+    container_name: board
+    networks:
+      - kitcha_network
+    expose:
+      - "8080"
+    depends_on:
+      auth:
+        condition: service_healthy
+    restart: on-failure
 
 volumes:
   mysql_data:
