@@ -111,6 +111,10 @@ services:
   article:
     build:
       context: https://github.com/Team4-Kitcha/Kitcha-Article.git
+    environment:
+      NAVER_CLIENT_ID: ${NAVER_CLIENT_ID}
+      NAVER_CLIENT_SECRET: ${NAVER_CLIENT_SECRET}
+      GROQ_API_KEY: ${GROQ_API_KEY}
     container_name: article
     networks:
       - kitcha_network

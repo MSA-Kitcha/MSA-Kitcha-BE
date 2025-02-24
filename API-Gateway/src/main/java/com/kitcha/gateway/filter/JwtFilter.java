@@ -52,11 +52,13 @@ public class JwtFilter implements GlobalFilter, Ordered {
                     .getPayload();
 
             String email = claims.getSubject();
+            String userId = claims.get("userId", String.class);
             String nickname = claims.get("nickname", String.class);
             String role = claims.get("role", String.class);
 
             ServerHttpRequest mutatedRequest = exchange.getRequest().mutate()
                     .header("X-User-Email", email)
+                    .header("X-User-Id", userId)
                     .header("X-User-Nickname", nickname)
                     .header("X-User-Role", role)
                     .build();
