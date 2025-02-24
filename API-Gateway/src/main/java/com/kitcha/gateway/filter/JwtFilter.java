@@ -22,7 +22,7 @@ public class JwtFilter implements GlobalFilter, Ordered {
     private final SecretKey hmacKey;
 
     public JwtFilter(Environment env) {
-        this.hmacKey = Keys.hmacShaKeyFor(Objects.requireNonNull(env.getProperty("token.secret")).getBytes());
+        this.hmacKey = Keys.hmacShaKeyFor(Objects.requireNonNull(env.getProperty("TOKEN_SECRET")).getBytes());
     }
 
     @Override
@@ -30,7 +30,7 @@ public class JwtFilter implements GlobalFilter, Ordered {
         String path = exchange.getRequest().getURI().getPath();
 
         // 인증 서비스는 토큰이 없어도 통과
-        if (path.startsWith("/authentication")) {
+        if (path.startsWith("/authentication/users/login") || path.startsWith("/authentication/users/sign-up")) {
             return chain.filter(exchange);
         }
 
