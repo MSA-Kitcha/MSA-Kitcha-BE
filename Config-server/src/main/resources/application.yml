@@ -13,10 +13,11 @@ spring:
             - article
             - auth
             - board
+            - eureka
+            - gateway
 
 server:
   port: 8071
 
 encrypt:
-  # ???? ???? ??? (??? ?? ??)
   key: WeAreTestOurProjectSoHappyUmmReally
