@@ -2,3 +2,5 @@ MYSQL_ROOT_PASSWORD=p@ssw0rd
 MYSQL_DATABASE=kitchadb
 MYSQL_USER=kitcha
 MYSQL_PASSWORD=p@ssw0rd
+
+SERVER_HOST=localhost
